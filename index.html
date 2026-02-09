@@ -1,0 +1,230 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>NSIB Secure Portal</title>
+
+<style>
+body{
+    margin:0;
+    font-family:Arial, sans-serif;
+    background:linear-gradient(135deg,#0f2027,#203a43,#2c5364);
+    color:white;
+    text-align:center;
+    overflow-x:hidden;
+}
+header{
+    padding:20px;
+    font-size:26px;
+    font-weight:bold;
+}
+.container{
+    margin-top:60px;
+}
+input{
+    padding:10px;
+    border:none;
+    border-radius:5px;
+    width:220px;
+}
+button{
+    padding:10px 15px;
+    border:none;
+    border-radius:5px;
+    margin-top:10px;
+    cursor:pointer;
+}
+.primary{
+    background:#00c6ff;
+    color:black;
+}
+.admin-btn{
+    position:absolute;
+    left:10px;
+    top:10px;
+    background:#ff9800;
+}
+.hidden{
+    display:none;
+}
+.card{
+    background:rgba(255,255,255,0.1);
+    padding:20px;
+    border-radius:12px;
+    width:320px;
+    margin:20px auto;
+    backdrop-filter:blur(8px);
+}
+.loader{
+    border:6px solid #f3f3f3;
+    border-top:6px solid #00c6ff;
+    border-radius:50%;
+    width:40px;
+    height:40px;
+    margin:20px auto;
+    animation:spin 1s linear infinite;
+}
+@keyframes spin{
+    0%{transform:rotate(0deg);}
+    100%{transform:rotate(360deg);}
+}
+.lang-menu{
+    position:absolute;
+    right:10px;
+    top:10px;
+}
+.signature{
+    font-family:cursive;
+    font-size:22px;
+    opacity:0;
+    animation:sign 2s forwards;
+}
+@keyframes sign{
+    to{opacity:1;}
+}
+</style>
+</head>
+<body>
+
+<button class="admin-btn" onclick="showAdmin()">Admin</button>
+
+<div class="lang-menu">
+<select id="languageSelect" onchange="changeLanguage()">
+<option value="en">English</option>
+<option value="fr">French</option>
+<option value="es">Spanish</option>
+<option value="pl">Polish</option>
+</select>
+</div>
+
+<header id="title">North Shield Investigation Bureau</header>
+
+<!-- PAGE 1 -->
+<div id="page1" class="container">
+<h3 id="caseInquiry">Case Inquiry</h3>
+<input type="text" id="caseInput" placeholder="Enter Case ID">
+<br>
+<button class="primary" onclick="checkCase()">Submit</button>
+<p id="error" style="color:red;"></p>
+<div id="loading" class="hidden">
+<div class="loader"></div>
+</div>
+</div>
+
+<!-- DASHBOARD -->
+<div id="dashboard" class="hidden">
+<div class="card">
+<p><strong>Case ID:</strong> <span id="caseId"></span></p>
+<p><strong>Case Charge:</strong> <span id="caseCharge"></span></p>
+<p><strong>Name:</strong> <span id="caseName"></span></p>
+
+<button class="primary" onclick="showOfficer()">Check Investigation Officer</button>
+
+<div id="officerDetails" class="hidden">
+<p><strong>IO:</strong> Officer Eric C Monti</p>
+<p><strong>Badge ID:</strong> EMC1978NSIB</p>
+<p class="signature">Eric Monti</p>
+</div>
+</div>
+</div>
+
+<!-- ADMIN PANEL -->
+<div id="adminPanel" class="hidden">
+<div class="card">
+<h3>Admin Login</h3>
+<input type="password" id="adminPass" placeholder="Enter Admin Password">
+<br>
+<button class="primary" onclick="adminLogin()">Login</button>
+
+<div id="adminArea" class="hidden">
+<h4>Add New Case</h4>
+<input type="text" id="newId" placeholder="Case ID"><br>
+<input type="text" id="newCharge" placeholder="Charge"><br>
+<input type="text" id="newName" placeholder="Name"><br>
+<button class="primary" onclick="addCase()">Add Case</button>
+</div>
+</div>
+</div>
+
+<script>
+
+let cases = {
+    "778249":{
+        charge:"Laughing heh he",
+        name:"Orry Haso"
+    },
+    "889900":{
+        charge:"Digital Disturbance",
+        name:"Max Carter"
+    }
+};
+
+function checkCase(){
+    let id = document.getElementById("caseInput").value;
+    document.getElementById("error").innerText="";
+    document.getElementById("loading").classList.remove("hidden");
+
+    setTimeout(()=>{
+        document.getElementById("loading").classList.add("hidden");
+
+        if(cases[id]){
+            document.getElementById("page1").classList.add("hidden");
+            document.getElementById("dashboard").classList.remove("hidden");
+            document.getElementById("caseId").innerText=id;
+            document.getElementById("caseCharge").innerText=cases[id].charge;
+            document.getElementById("caseName").innerText=cases[id].name;
+        } else{
+            document.getElementById("error").innerText="Invalid Case Number";
+            playErrorSound();
+        }
+    },1500);
+}
+
+function showOfficer(){
+    document.getElementById("officerDetails").classList.toggle("hidden");
+    playSuccessSound();
+}
+
+function showAdmin(){
+    document.getElementById("adminPanel").classList.toggle("hidden");
+}
+
+function adminLogin(){
+    let pass=document.getElementById("adminPass").value;
+    if(pass==="nsibadmin"){
+        document.getElementById("adminArea").classList.remove("hidden");
+    }else{
+        alert("Wrong Password");
+    }
+}
+
+function addCase(){
+    let id=document.getElementById("newId").value;
+    let charge=document.getElementById("newCharge").value;
+    let name=document.getElementById("newName").value;
+
+    if(id && charge && name){
+        cases[id]={charge,name};
+        alert("Case Added Successfully");
+    }
+}
+
+function playErrorSound(){
+    let audio=new Audio("https://actions.google.com/sounds/v1/alarms/beep_short.ogg");
+    audio.play();
+}
+
+function playSuccessSound(){
+    let audio=new Audio("https://actions.google.com/sounds/v1/cartoon/clang_and_wobble.ogg");
+    audio.play();
+}
+
+function changeLanguage(){
+    alert("Language switch demo active. Static demo version.");
+}
+
+</script>
+
+</body>
+</html>
